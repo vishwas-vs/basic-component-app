@@ -1,6 +1,13 @@
-# Docker Setup for Basic Component App
+# 🔐 Secure Docker Setup for Basic Component App
 
-This document explains how to build and run the dockerized version of the Basic Component App.
+This document explains how to securely build and run the dockerized version of the Basic Component App with proper secrets management.
+
+## 🔒 Security Features
+
+- ✅ **No hardcoded tokens** in committed files
+- ✅ **Environment-based secrets** management
+- ✅ **Build-time token injection** only
+- ✅ **Clean final image** without exposed credentials
 
 ## Prerequisites
 
@@ -17,9 +24,42 @@ This document explains how to build and run the dockerized version of the Basic 
 
 2. **Docker**: Ensure Docker is installed and running on your system
 
-## Building the Docker Image
+3. **Environment Setup**: Configure your authentication token securely
+   ```bash
+   # Copy the template
+   cp .env.template .env.local
+   
+   # Add your actual Bit token to .env.local (see setup section below)
+   ```
 
-### Method 1: Using the Build Script (Recommended)
+## 🔧 Secure Setup Process
+
+### Step 1: Get Your Bit Authentication Token
+```bash
+# 1. Login to Bit
+bit login
+
+# 2. Check your global .npmrc for the token (Linux/macOS)
+cat ~/.npmrc | grep "_authToken"
+
+# 2. Check your global .npmrc for the token (Windows)
+type %USERPROFILE%\.npmrc | findstr "_authToken"
+```
+
+### Step 2: Configure Environment Variables
+```bash
+# 1. Copy the template
+cp .env.template .env.local
+
+# 2. Edit .env.local and replace 'your_bit_auth_token_here' with your actual token
+# BIT_TOKEN=your_actual_token_here
+```
+
+⚠️ **Important**: The `.env.local` file is automatically ignored by git and will not be committed.
+
+## 🚀 Building the Docker Image
+
+### Method 1: Using Secure Build Scripts (Recommended)
 ```powershell
 # Windows PowerShell
 .\build-docker.ps1
@@ -30,11 +70,17 @@ This document explains how to build and run the dockerized version of the Basic 
 ./build-docker.sh
 ```
 
-### Method 2: Manual Build
-If you have already logged in to Bit and the `.npmrc` file contains the authentication token:
-
+### Method 2: Manual Secure Build
 ```bash
-docker build -t basic-component-app .
+# Load environment variables and build with build argument
+source .env.local  # Linux/macOS
+docker build --build-arg BIT_TOKEN="$BIT_TOKEN" -t basic-component-app .
+```
+
+```powershell
+# Windows PowerShell
+Get-Content .env.local | ForEach-Object { if($_ -match "^BIT_TOKEN=(.*)") { $env:BIT_TOKEN=$matches[1] } }
+docker build --build-arg BIT_TOKEN="$env:BIT_TOKEN" -t basic-component-app .
 ```
 
 ## Running the Docker Container

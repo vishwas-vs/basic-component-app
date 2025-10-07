@@ -7,17 +7,24 @@ RUN apk add --no-cache libc6-compat
 # Set working directory
 WORKDIR /app
 
-# Build argument for auth token
+# Build argument for auth token (passed securely at build time)
 ARG BIT_TOKEN
 
 # Set environment variables
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# Copy package files and registry configuration (including auth)
-COPY package.json package-lock.json* .npmrc ./
+# Copy package files (without .npmrc to avoid exposing token)
+COPY package.json package-lock.json* ./
+
+# Create secure .npmrc with build-time token
+RUN echo "@shrijulvenkatesh:registry=https://node-registry.bit.cloud/" > .npmrc && \
+    echo "//node-registry.bit.cloud/:_authToken=${BIT_TOKEN}" >> .npmrc
 
 # Install dependencies (including dev dependencies for build)
 RUN npm ci
+
+# Remove .npmrc after installation to avoid exposing token in final image
+RUN rm -f .npmrc
 
 # Copy source code
 COPY . .
