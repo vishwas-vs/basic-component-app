@@ -1,0 +1,60 @@
+/* Vertical slider styles */
+.vertical-slider {
+  -webkit-appearance: slider-vertical;
+  appearance: none;
+  writing-mode: bt-lr; /* fallback for older browsers */
+  width: 10px;
+  height: 100%;
+  outline: none;
+  opacity: 0.7;
+  transition: opacity 0.2s;
+}
+
+.vertical-slider:hover {
+  opacity: 1;
+}
+
+.vertical-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3B82F6;
+  cursor: pointer;
+}
+
+.vertical-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #3B82F6;
+  cursor: pointer;
+  border: none;
+}
+
+/* Interactive components container */
+.interactive-components {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  padding: 1rem;
+}
+
+/* Responsive grid for components */
+.component-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+@media (max-width: 768px) {
+  .component-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .vertical-slider {
+    width: 8px;
+  }
+}
